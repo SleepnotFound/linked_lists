@@ -7,12 +7,10 @@ class LinkedList
   end
   
   def append(value)
+    self.tail = Node.new(value)
     if self.head.nil?
-      new_node = Node.new(value)
-      self.head = new_node
-      self.tail = new_node
+      self.head = self.tail
     else
-      self.tail = Node.new(value)
       pointer = self.head
       until pointer.next_node.nil?
         pointer = pointer.next_node
@@ -34,64 +32,57 @@ class LinkedList
   end
 
   def size 
-    return 0 if self.head.nil?
-
-    i = 1
-    pointer = self.head
-    until pointer.next_node.nil?
-      pointer = pointer.next_node
-      i += 1
-    end
+    i = 0
+    each_node { |node| i += 1 }
     i
   end
 
   def at(index)
-    pointer = self.head
-    index.times do
-      pointer = pointer.next_node
+    each_node do |node|
+      return node if index == 0
+      index -= 1
     end
-    pointer
   end
 
   def pop
     pop_tail = self.tail
-    pointer = self.head
-    until pointer.next_node == self.tail
-      pointer = pointer.next_node
+    each_node do |node| 
+      if node.next_node == self.tail
+        self.tail = node
+        node.next_node = nil 
+      end
     end
-    pointer.next_node = nil
-    self.tail = pointer
     pop_tail
   end
 
   def contains?(value)
-    pointer = self.head
-    until pointer.nil? 
-      return true if pointer.value == value
-      pointer = pointer.next_node
-    end
+    each_node { |node| return true if node.value == value}
     false
   end
 
   def find(value)
     i = 0
-    pointer = self.head
-    until pointer.nil?
-      return i if pointer.value == value
+    each_node do |node|
+      return i if node.value == value
       i += 1
-      pointer = pointer.next_node 
     end
     nil
   end
 
   def to_s
     string = ""
-    pointer = self.head
-    until pointer.nil?
-      string << "(" << pointer.value.to_s << ") -> "
-      pointer = pointer.next_node
+    each_node do |node|
+      string << "(" << node.value.to_s << ") -> "
     end
     string << "nil"
+  end
+
+  def each_node
+    pointer = self.head
+    until pointer.nil?
+      yield pointer
+      pointer = pointer.next_node
+    end
   end
 end
 
@@ -117,14 +108,17 @@ p list
 puts "size:#{list.size}"
 #puts list.head
 #puts list.tail
-#puts list.at(2)
-puts "pop: #{list.pop}"
-p list
-puts list.size
-puts list.contains?(777)
-puts list.contains?(69)
-puts list.contains?(42)
+puts "node at index 2:#{list.at(2)}"
+puts list.to_s
+last_element = list.pop
+puts "pop: #{last_element}"
+p last_element
+#p list
+puts "size after pop: #{list.size}"
 
-puts list.find(69)
-puts list.find(420)
+puts "contains 420? :#{list.contains?(420)}"
+puts "contains 42? :#{list.contains?(42)}"
+
+puts "69 at index:#{list.find(69)}"
+puts "420 at index:#{list.find(420)}"
 puts list.to_s
