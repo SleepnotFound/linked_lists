@@ -9,23 +9,24 @@ class LinkedList
   def append(value)
     self.tail = Node.new(value)
     if self.head.nil?
-      self.head = self.tail
+      self.head = self.tail 
     else
-      pointer = self.head
-      until pointer.next_node.nil?
-        pointer = pointer.next_node
+      each_node do |node| 
+        if node.next_node.nil?
+          node.next_node = self.tail 
+          break
+        end
       end
-      pointer.next_node = self.tail
+        
     end
   end
 
   def prepend(value)
+    new_head = Node.new(value)
     if self.head.nil?
-      new_node = Node.new(value)
-      self.head = new_node
-      self.tail = new_node
+      self.head = new_head
+      self.tail = new_head
     else
-      new_head = Node.new(value)
       new_head.next_node = self.head
       self.head = new_head
     end
@@ -77,6 +78,41 @@ class LinkedList
     string << "nil"
   end
 
+  def insert_at(value, index)
+    i = 0
+    each_node do |node|
+      if index == 0 
+        self.prepend(value)
+        break 
+      elsif index == i + 1
+        insert_node = Node.new(value, self.at(index))
+        node.next_node = insert_node 
+        break
+      else
+        i += 1
+      end
+    end
+    self
+  end
+
+  def remove_at(index)
+    right = self.at(index)
+    right = right.next_node
+    i = 0
+    each_node do |node|
+      if index == 0
+        self.head = right
+        break
+      elsif index == i + 1
+        node.next_node = right
+        break
+      else
+        i += 1
+      end
+    end
+    self
+  end
+
   def each_node
     pointer = self.head
     until pointer.nil?
@@ -96,29 +132,29 @@ class Node
 end
 
 list = LinkedList.new
-list.append(42)
-#p list
-list.append(69)
-#p list
-list.append(420)
-#p list
-list.prepend("IM the head")
-p list
-
-puts "size:#{list.size}"
-#puts list.head
-#puts list.tail
-puts "node at index 2:#{list.at(2)}"
 puts list.to_s
+list.append(42)
+list.append(69)
+list.append(420)
+list.prepend("IM the head")
+puts list.to_s
+puts "head: #{list.head}"
+puts "tail: #{list.tail}"
+puts "size:#{list.size}"
+
+puts "node at index 2:#{list.at(2)}"
 last_element = list.pop
-puts "pop: #{last_element}"
+p "pop: #{last_element}"
 p last_element
-#p list
 puts "size after pop: #{list.size}"
 
 puts "contains 420? :#{list.contains?(420)}"
 puts "contains 42? :#{list.contains?(42)}"
-
 puts "69 at index:#{list.find(69)}"
 puts "420 at index:#{list.find(420)}"
 puts list.to_s
+
+puts list.insert_at(34, 0)
+puts list.insert_at(777, 2)
+puts list.remove_at(3)
+puts list.remove_at(0)
